@@ -24,6 +24,8 @@ public class PanelClientes extends JPanel {
     private final JTextField campoTelefono = EstiloUI.crearCampoTexto();
     private final JTextField campoCorreo = EstiloUI.crearCampoTexto();
     private final JTextField campoDireccion = EstiloUI.crearCampoTexto();
+    private final JTextField campoApellidoPaterno = EstiloUI.crearCampoTexto();
+private final JTextField campoApellidoMaterno = EstiloUI.crearCampoTexto();
 
     private Integer idSeleccionado = null;
 
@@ -72,13 +74,18 @@ public class PanelClientes extends JPanel {
         c.gridx = 1; c.weightx = 1; formulario.add(campoDni, c);
         c.gridx = 2; c.weightx = 0; formulario.add(EstiloUI.crearEtiqueta("Nombre"), c);
         c.gridx = 3; c.weightx = 1; formulario.add(campoNombre, c);
+        c.gridx = 0; c.gridy = 1; c.weightx = 0; formulario.add(EstiloUI.crearEtiqueta("Apellido Paterno"), c);
+        c.gridx = 1; c.weightx = 1; formulario.add(campoApellidoPaterno, c);
+        c.gridx = 2; c.weightx = 0; formulario.add(EstiloUI.crearEtiqueta("Apellido Materno"), c);
+        c.gridx = 3; c.weightx = 1; formulario.add(campoApellidoMaterno, c);
+        
 
-        c.gridx = 0; c.gridy = 1; c.weightx = 0; formulario.add(EstiloUI.crearEtiqueta("Telefono"), c);
+        c.gridx = 0; c.gridy = 2; c.weightx = 0; formulario.add(EstiloUI.crearEtiqueta("Telefono"), c);
         c.gridx = 1; c.weightx = 1; formulario.add(campoTelefono, c);
         c.gridx = 2; c.weightx = 0; formulario.add(EstiloUI.crearEtiqueta("Correo"), c);
         c.gridx = 3; c.weightx = 1; formulario.add(campoCorreo, c);
 
-        c.gridx = 0; c.gridy = 2; c.weightx = 0; formulario.add(EstiloUI.crearEtiqueta("Direccion"), c);
+        c.gridx = 0; c.gridy = 3; c.weightx = 0; formulario.add(EstiloUI.crearEtiqueta("Direccion"), c);
         c.gridx = 1; c.gridwidth = 3; c.weightx = 1; formulario.add(campoDireccion, c);
         c.gridwidth = 1;
 
@@ -94,7 +101,7 @@ public class PanelClientes extends JPanel {
         ((javax.swing.JButton) botones.getComponent(2)).addActionListener(e -> eliminar());
         ((javax.swing.JButton) botones.getComponent(3)).addActionListener(e -> limpiarFormulario());
 
-        c.gridx = 0; c.gridy = 3; c.gridwidth = 4; c.insets = new Insets(14, 5, 0, 5);
+        c.gridx = 0; c.gridy = 4; c.gridwidth = 4; c.insets = new Insets(14, 5, 0, 5);
         formulario.add(botones, c);
 
         return formulario;

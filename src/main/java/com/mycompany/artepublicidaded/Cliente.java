@@ -29,6 +29,8 @@ public class Cliente {
         System.out.println("CLIENTE ID: " + this.id
                 + " DNI: " + this.dni
                 + " NOMBRE: " + this.nombre
+                + "APELLIDO PATERNO: " +this.apellido_paterno
+                + "APELLIDO MATERNO: " +this.apellido_materno
                 + " TEL: " + this.telefono
                 + " CORREO: " + this.correo
                 + " DIRECCION: " + this.direccion);
