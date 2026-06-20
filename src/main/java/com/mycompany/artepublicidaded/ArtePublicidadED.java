@@ -1,7 +1,6 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
-
 package com.mycompany.artepublicidaded;
 
 /**
@@ -11,6 +10,6 @@ package com.mycompany.artepublicidaded;
 public class ArtePublicidadED {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        VentanaPrincipal.main(args);
     }
 }
