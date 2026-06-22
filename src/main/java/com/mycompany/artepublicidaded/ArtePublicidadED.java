@@ -10,6 +10,5 @@ package com.mycompany.artepublicidaded;
 public class ArtePublicidadED {
 
     public static void main(String[] args) {
-        VentanaPrincipal.main(args);
     }
 }
