@@ -24,6 +24,7 @@ public class LoginForm extends javax.swing.JFrame {
         initComponents();
         configurarPlaceholders();
         configurarPlaceholderClaveConLabel();
+        this.setLocationRelativeTo(null);
     }
 
     /**
@@ -41,6 +42,7 @@ public class LoginForm extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         lblPlaceholderClave = new javax.swing.JLabel();
         txtContraseña = new javax.swing.JPasswordField();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Login");
@@ -62,15 +64,19 @@ public class LoginForm extends javax.swing.JFrame {
 
         jButton1.setText("Login");
         jButton1.addActionListener(this::jButton1ActionPerformed);
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(141, 223, -1, -1));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 220, -1, -1));
 
         lblPlaceholderClave.setForeground(new java.awt.Color(150, 150, 150));
         lblPlaceholderClave.setText("Contraseña");
         jPanel1.add(lblPlaceholderClave, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 150, 70, 30));
 
-        txtContraseña.setEchoChar('\u25cf');
+        txtContraseña.setEchoChar('*');
         txtContraseña.addActionListener(this::txtContraseñaActionPerformed);
         jPanel1.add(txtContraseña, new org.netbeans.lib.awtextra.AbsoluteConstraints(99, 138, 175, 48));
+
+        jButton2.setText("Register");
+        jButton2.addActionListener(this::jButton2ActionPerformed);
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 220, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -131,12 +137,36 @@ public class LoginForm extends javax.swing.JFrame {
         String Usuario = txtUsuario.getText();
         String clave = new String (txtContraseña.getPassword());
         
-        if (Usuario.equals("admin") && clave.equals("1234")){
+        if (Usuario.equals("Usuario") || Usuario.isEmpty() || clave.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Ingresa usuario y contraseña", "Atencion", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if(validarUsuario(Usuario, clave)){
             JOptionPane.showMessageDialog(this, "Bienvenido, " + Usuario);
+            //this.dispose();
+            //new VentanaPrincipal().setVisible(true);
         } else {
             JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+private boolean validarUsuario(String usuario, String clave) {
+    java.io.File archivo = new java.io.File("usuarios.txt");
+    if (!archivo.exists()){
+        return false;
+    }
+    try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(archivo))) {
+        String linea;
+        while((linea = br.readLine()) != null){
+            String[] partes = linea.split(",");
+            if (partes.length == 2 && partes [0].equals(usuario) && partes[1].equals(clave)){
+                return true;
+            }
+        }
+    } catch (java.io.IOException e){
+        JOptionPane.showMessageDialog(this, "Error al leer: " +e.getMessage());
+    }
+    return false;
+}
 
     private void txtUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioActionPerformed
         // TODO add your handling code here:
@@ -145,6 +175,12 @@ public class LoginForm extends javax.swing.JFrame {
     private void txtContraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtContraseñaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtContraseñaActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        new RegistroForm().setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -173,6 +209,7 @@ public class LoginForm extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblPlaceholderClave;
