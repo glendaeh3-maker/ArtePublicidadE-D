@@ -30,7 +30,7 @@ public class ArtePublicidadEDFinal extends Application {
 
     @Override
 public void start(Stage stage) {
-    // ===== LADO IZQUIERDO - Logo =====
+    // Logo 
     Image imagen = new Image(getClass().getResourceAsStream("/artepublicidaded/pkgfinal/images/logo.png"));
     ImageView imageView = new ImageView(imagen);
     imageView.setFitWidth(300);
@@ -41,7 +41,7 @@ public void start(Stage stage) {
     panelIzquierdo.setStyle("-fx-background-color: #4CAF50; -fx-min-width: 350px;");
     panelIzquierdo.setAlignment(Pos.CENTER);
 
-    // ===== LADO DERECHO - Formulario =====
+    //Formulario 
     Label lblTitulo = new Label("Login");
     lblTitulo.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;");
 
@@ -102,7 +102,7 @@ public void start(Stage stage) {
         btnRegistro
     );
 
-    // ===== LAYOUT PRINCIPAL =====
+    // Layout
     HBox root = new HBox();
     root.getChildren().addAll(panelIzquierdo, panelDerecho);
 

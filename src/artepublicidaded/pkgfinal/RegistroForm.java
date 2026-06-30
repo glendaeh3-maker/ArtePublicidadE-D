@@ -31,7 +31,15 @@ public class RegistroForm {
         TextField txtDni = new TextField();
         txtDni.setPromptText("DNI");
         txtDni.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
-
+        txtDni.textProperty().addListener((obs, oldText, newText) -> {
+        if (!newText.matches("\\d*")) {
+        txtDni.setText(newText.replaceAll("[^\\d]", ""));
+        }
+        if (txtDni.getText().length() > 8) {
+        txtDni.setText(txtDni.getText().substring(0, 8));
+         }
+       });
+        
         TextField txtNombre = new TextField();
         txtNombre.setPromptText("Nombre");
         txtNombre.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
@@ -47,7 +55,15 @@ public class RegistroForm {
         TextField txtTelefono = new TextField();
         txtTelefono.setPromptText("Teléfono");
         txtTelefono.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
-
+        txtTelefono.textProperty().addListener((obs, oldText, newText) -> {
+        if (!newText.matches("\\d*")) {
+        txtTelefono.setText(newText.replaceAll("[^\\d]", ""));
+        }
+        if (txtTelefono.getText().length() > 9) {
+        txtTelefono.setText(txtTelefono.getText().substring(0, 9));
+        }
+        });
+        
         TextField txtCorreo = new TextField();
         txtCorreo.setPromptText("Correo");
         txtCorreo.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
@@ -92,17 +108,54 @@ public class RegistroForm {
         });
 
         btnRegistrar.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent t) {
-                if (txtDni.getText().isEmpty() || txtNombre.getText().isEmpty() ||
-                    txtClave.getText().isEmpty() || txtUsuario.getText().isEmpty()) {
-                    lblMensaje.setText("Completa los campos obligatorios");
-                } else {
-                    lblMensaje.setStyle("-fx-text-fill: green;");
-                    lblMensaje.setText("Registro exitoso");
-                }
-            }
-        });
+    @Override
+    public void handle(ActionEvent t) {
+        String dni = txtDni.getText();
+        String telefono = txtTelefono.getText();
+        String correo = txtCorreo.getText();
+
+        if (dni.isEmpty() || txtNombre.getText().isEmpty() ||
+            txtClave.getText().isEmpty() || txtUsuario.getText().isEmpty()) {
+            lblMensaje.setStyle("-fx-text-fill: red;");
+            lblMensaje.setText("Completa los campos obligatorios");
+            return;
+        }
+
+        if (dni.length() != 8) {
+            lblMensaje.setStyle("-fx-text-fill: red;");
+            lblMensaje.setText("El DNI debe tener 8 dígitos");
+            return;
+        }
+
+        if (telefono.length() != 9) {
+            lblMensaje.setStyle("-fx-text-fill: red;");
+            lblMensaje.setText("El teléfono debe tener 9 dígitos");
+            return;
+        }
+
+        if (!correo.matches("^[\\w.+-]+@(gmail|hotmail|outlook)\\.com$")) {
+            lblMensaje.setStyle("-fx-text-fill: red;");
+            lblMensaje.setText("Correo inválido (usa gmail, hotmail u outlook)");
+            return;
+        }
+
+        lblMensaje.setStyle("-fx-text-fill: green;");
+        lblMensaje.setText("Registro exitoso");
+    }
+});
+
+// Y esto separado, para btnVolver (volver al login):
+btnVolver.setOnAction(new EventHandler<ActionEvent>() {
+    @Override
+    public void handle(ActionEvent t) {
+        ArtePublicidadEDFinal app = new ArtePublicidadEDFinal();
+        try {
+            app.start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+});
 
         HBox botones = new HBox(15, btnRegistrar, btnVolver);
         botones.setAlignment(Pos.CENTER_LEFT);
