@@ -130,9 +130,9 @@ public class RegistroForm {
             lblMensaje.setText("El teléfono debe tener 9 dígitos");
             return;
         }
-        if (!correo.matches("^[\\w.+-]+@(gmail|hotmail|outlook)\\.com$")) {
+        if (!correo.matches("^[\\w.+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
             lblMensaje.setStyle("-fx-text-fill: red;");
-            lblMensaje.setText("Correo inválido (usa gmail, hotmail u outlook)");
+            lblMensaje.setText("Correo inválido");
             return;
         }
 
