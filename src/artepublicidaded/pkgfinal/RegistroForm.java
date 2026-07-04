@@ -28,7 +28,7 @@ public class RegistroForm {
         Label lblSubtitulo = new Label("Completa tus datos para registrarte:");
         lblSubtitulo.setStyle("-fx-font-size: 12px; -fx-text-fill: #888;");
 
-        TextField txtDni = new TextField();
+        final TextField txtDni = new TextField();
         txtDni.setPromptText("DNI");
         txtDni.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
         txtDni.textProperty().addListener((obs, oldText, newText) -> {
@@ -40,19 +40,19 @@ public class RegistroForm {
          }
        });
         
-        TextField txtNombre = new TextField();
+        final TextField txtNombre = new TextField();
         txtNombre.setPromptText("Nombre");
         txtNombre.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
 
-        TextField txtApellidoP = new TextField();
+        final TextField txtApellidoP = new TextField();
         txtApellidoP.setPromptText("Apellido Paterno");
         txtApellidoP.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
 
-        TextField txtApellidoM = new TextField();
+        final TextField txtApellidoM = new TextField();
         txtApellidoM.setPromptText("Apellido Materno");
         txtApellidoM.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
 
-        TextField txtTelefono = new TextField();
+        final TextField txtTelefono = new TextField();
         txtTelefono.setPromptText("Teléfono");
         txtTelefono.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
         txtTelefono.textProperty().addListener((obs, oldText, newText) -> {
@@ -64,23 +64,23 @@ public class RegistroForm {
         }
         });
         
-        TextField txtCorreo = new TextField();
+        final TextField txtCorreo = new TextField();
         txtCorreo.setPromptText("Correo");
         txtCorreo.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
 
-        TextField txtDireccion = new TextField();
+        final TextField txtDireccion = new TextField();
         txtDireccion.setPromptText("Dirección");
         txtDireccion.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
 
-        TextField txtUsuario = new TextField();
+        final TextField txtUsuario = new TextField();
         txtUsuario.setPromptText("Usuario");
         txtUsuario.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
 
-        PasswordField txtClave = new PasswordField();
+        final PasswordField txtClave = new PasswordField();
         txtClave.setPromptText("Contraseña");
         txtClave.setStyle("-fx-pref-width: 280px; -fx-pref-height: 38px; -fx-background-radius: 8; -fx-background-color: #f0f0f0; -fx-border-color: transparent;");
 
-        Label lblMensaje = new Label("");
+        final Label lblMensaje = new Label("");
         lblMensaje.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
 
         Button btnRegistrar = new Button("Registrarse");
@@ -120,27 +120,35 @@ public class RegistroForm {
             lblMensaje.setText("Completa los campos obligatorios");
             return;
         }
-
         if (dni.length() != 8) {
             lblMensaje.setStyle("-fx-text-fill: red;");
             lblMensaje.setText("El DNI debe tener 8 dígitos");
             return;
         }
-
         if (telefono.length() != 9) {
             lblMensaje.setStyle("-fx-text-fill: red;");
             lblMensaje.setText("El teléfono debe tener 9 dígitos");
             return;
         }
-
         if (!correo.matches("^[\\w.+-]+@(gmail|hotmail|outlook)\\.com$")) {
             lblMensaje.setStyle("-fx-text-fill: red;");
             lblMensaje.setText("Correo inválido (usa gmail, hotmail u outlook)");
             return;
         }
 
-        lblMensaje.setStyle("-fx-text-fill: green;");
-        lblMensaje.setText("Registro exitoso");
+        boolean exito = UsuarioControlador.registrarCliente(
+            dni, txtNombre.getText(), txtApellidoP.getText(),
+            txtApellidoM.getText(), telefono, correo,
+            txtDireccion.getText(), txtUsuario.getText(), txtClave.getText()
+        );
+
+        if (exito) {
+            lblMensaje.setStyle("-fx-text-fill: green;");
+            lblMensaje.setText("Registro exitoso. Ya puedes iniciar sesión.");
+        } else {
+            lblMensaje.setStyle("-fx-text-fill: red;");
+            lblMensaje.setText("El usuario o DNI ya están registrados");
+        }
     }
 });
 
