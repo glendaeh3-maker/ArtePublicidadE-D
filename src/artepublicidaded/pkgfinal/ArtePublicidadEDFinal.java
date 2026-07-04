@@ -70,6 +70,7 @@ public void start(Stage stage) {
     Button btnRegistro = new Button("¿No tienes cuenta? Regístrate");
     btnRegistro.setStyle("-fx-background-color: transparent; -fx-text-fill: #4CAF50; " +
                          "-fx-font-size: 12px; -fx-cursor: hand;");
+    
 
     btnLogin.setOnAction(new EventHandler<ActionEvent>() {
         @Override
@@ -83,6 +84,14 @@ public void start(Stage stage) {
             }
         }
     });
+    btnLogin.setOnAction(new EventHandler<ActionEvent>() {
+    @Override
+    public void handle(ActionEvent t) {
+        String usuario = txtUsuario.getText();
+        new VentanaPrincipal(stage, usuario);
+       }
+    });
+    
     btnRegistro.setOnAction(new EventHandler<ActionEvent>() {
     @Override
     public void handle(ActionEvent t) {
