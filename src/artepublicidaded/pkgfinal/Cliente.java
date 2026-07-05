@@ -38,6 +38,7 @@ public class Cliente {
 
     // Getters y Setters
     public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public String getApellido_paterno() {
         return apellido_paterno;

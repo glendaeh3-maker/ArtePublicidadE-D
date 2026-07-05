@@ -1,6 +1,11 @@
 package artepublicidaded.pkgfinal;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -12,68 +17,122 @@ import java.util.ArrayList;
  * @author Genes
  */
 public class ClienteControlador {
-
-    ArrayList<Cliente> lista = new ArrayList();
-
-    public void agregar_cliente(Cliente nuevo) {
-        lista.add(nuevo);
-    }
-
-    public void listar_clientes() {
-        for (int i = 0; i < lista.size(); i++) {
-            lista.get(i).verDatos();
+// ===== Agregar cliente =====
+    public static boolean agregar(Cliente cliente) {
+        String sql = "INSERT INTO cliente (usuario_id, dni, nombre, apellido_paterno, " +
+                     "apellido_materno, telefono, correo, direccion) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try {
+            Connection con = ConexionBD.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, cliente.getId());
+            ps.setString(2, cliente.getDni());
+            ps.setString(3, cliente.getNombre());
+            ps.setString(4, cliente.getApellido_paterno());
+            ps.setString(5, cliente.getApellido_materno());
+            ps.setString(6, cliente.getTelefono());
+            ps.setString(7, cliente.getCorreo());
+            ps.setString(8, cliente.getDireccion());
+            ps.executeUpdate();
+            con.close();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error al agregar cliente: " + e.getMessage());
+            return false;
         }
     }
 
-    // Busca cliente por id
-    public Cliente buscar_por_id(int id) {
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getId() == id) {
-                return lista.get(i);
+    // ===== Listar todos los clientes =====
+    public static List<Cliente> listar() {
+        List<Cliente> lista = new ArrayList<>();
+        String sql = "SELECT * FROM cliente";
+        try {
+            Connection con = ConexionBD.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Cliente c = new Cliente();
+                c.setId(rs.getInt("id"));
+                c.setDni(rs.getString("dni"));
+                c.setNombre(rs.getString("nombre"));
+                c.setApellido_paterno(rs.getString("apellido_paterno"));
+                c.setApellido_materno(rs.getString("apellido_materno"));
+                c.setTelefono(rs.getString("telefono"));
+                c.setCorreo(rs.getString("correo"));
+                c.setDireccion(rs.getString("direccion"));
+                lista.add(c);
             }
+            con.close();
+        } catch (SQLException e) {
+            System.out.println("Error al listar clientes: " + e.getMessage());
         }
-        System.out.println("No se encontro cliente con ID: " + id);
-        return null;
-    }
-
-    // Busca cliente por nombre (coincidencia parcial)
-    public Cliente buscar_por_nombre(String nombre) {
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getNombre().toLowerCase().contains(nombre.toLowerCase())) {
-                return lista.get(i);
-            }
-        }
-        System.out.println("No se encontro cliente con nombre: " + nombre);
-        return null;
-    }
-
-    // Busca cliente por DNI (es UNIQUE en la tabla CLIENTE)
-    public Cliente buscar_por_dni(String dni) {
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getDni().equals(dni)) {
-                return lista.get(i);
-            }
-        }
-        System.out.println("No se encontro cliente con DNI: " + dni);
-        return null;
-    }
-
-    // Elimina cliente por id
-    public boolean eliminar_cliente(int id) {
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getId() == id) {
-                lista.remove(i);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int total() {
-        return lista.size();
-    }
-
-    public ArrayList<Cliente> getLista() {
         return lista;
+    }
+
+    // ===== Buscar cliente por DNI =====
+    public static Cliente buscarPorDni(String dni) {
+        String sql = "SELECT * FROM cliente WHERE dni = ?";
+        try {
+            Connection con = ConexionBD.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, dni);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Cliente c = new Cliente();
+                c.setId(rs.getInt("id"));
+                c.setDni(rs.getString("dni"));
+                c.setNombre(rs.getString("nombre"));
+                c.setApellido_paterno(rs.getString("apellido_paterno"));
+                c.setApellido_materno(rs.getString("apellido_materno"));
+                c.setTelefono(rs.getString("telefono"));
+                c.setCorreo(rs.getString("correo"));
+                c.setDireccion(rs.getString("direccion"));
+                con.close();
+                return c;
+            }
+            con.close();
+        } catch (SQLException e) {
+            System.out.println("Error al buscar cliente: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // ===== Actualizar cliente =====
+    public static boolean actualizar(Cliente cliente) {
+        String sql = "UPDATE cliente SET nombre=?, apellido_paterno=?, apellido_materno=?, " +
+                     "telefono=?, correo=?, direccion=? WHERE dni=?";
+        try {
+            Connection con = ConexionBD.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, cliente.getNombre());
+            ps.setString(2, cliente.getApellido_paterno());
+            ps.setString(3, cliente.getApellido_materno());
+            ps.setString(4, cliente.getTelefono());
+            ps.setString(5, cliente.getCorreo());
+            ps.setString(6, cliente.getDireccion());
+            ps.setString(7, cliente.getDni());
+            ps.executeUpdate();
+            con.close();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error al actualizar cliente: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // ===== Eliminar cliente =====
+    public static boolean eliminar(String dni) {
+        String sql = "DELETE FROM cliente WHERE dni = ?";
+        try {
+            Connection con = ConexionBD.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, dni);
+            ps.executeUpdate();
+            con.close();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar cliente: " + e.getMessage());
+            return false;
+        }
     }
 }
