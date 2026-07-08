@@ -42,19 +42,19 @@ public class VentanaPrincipalAdmin {
         VBox encabezado = new VBox(2, lblLogo, lblRol, lblNombre);
         encabezado.setStyle("-fx-padding: 0 0 25 0;");
 
-        Button btnUsuarios = crearBotonMenu("👥 Usuarios y Accesos");
-        Button btnEmpleadosClientes = crearBotonMenu("👔 Empleados y Clientes");
-        Button btnProductos = crearBotonMenu("📦 Productos y Categorías");
-        Button btnAlmacenes = crearBotonMenu("🏭 Almacenes y Materiales");
-        Button btnProveedores = crearBotonMenu("🚚 Proveedores y Compras");
-        Button btnFacturacion = crearBotonMenu("💰 Facturación y Pagos");
-        Button btnServicios = crearBotonMenu("⭐ Servicios Especiales");
-        Button btnReportes = crearBotonMenu("📊 Reportes");
+        Button btnUsuarios = crearBotonMenu("Usuarios y Accesos");
+        Button btnEmpleadosClientes = crearBotonMenu("Empleados y Clientes");
+        Button btnProductos = crearBotonMenu("Productos y Categorías");
+        Button btnAlmacenes = crearBotonMenu("Almacenes y Materiales");
+        Button btnProveedores = crearBotonMenu("Proveedores y Compras");
+        Button btnFacturacion = crearBotonMenu("Facturación y Pagos");
+        Button btnServicios = crearBotonMenu("Servicios Especiales");
+        Button btnReportes = crearBotonMenu("Reportes");
 
         Region espacio = new Region();
         VBox.setVgrow(espacio, Priority.ALWAYS);
 
-        Button btnSalir = crearBotonMenu("🚪 Cerrar Sesión");
+        Button btnSalir = crearBotonMenu("Cerrar Sesión");
         btnSalir.setStyle(btnSalir.getStyle() + "-fx-text-fill: #ffcdd2;");
 
         sidebar.getChildren().addAll(
@@ -79,8 +79,19 @@ public class VentanaPrincipalAdmin {
         mostrarPanelPrincipal(usuario);
 
         // ===== EVENTOS DE NAVEGACIÓN =====
-        btnUsuarios.setOnAction(e -> mostrarSeccion("Usuarios y Accesos"));
-        btnEmpleadosClientes.setOnAction(e -> mostrarSeccion("Empleados y Clientes"));
+        btnUsuarios.setOnAction(e -> {
+        UsuariosPanel panel = new UsuariosPanel();
+        contenido.getChildren().setAll(panel.getPanel());
+        });
+        btnEmpleadosClientes.setOnAction(e -> {
+        EmpleadosClientesPanel panel = new EmpleadosClientesPanel();
+        VBox panelVista = panel.getPanel();
+        ScrollPane scroll = new ScrollPane(panelVista);
+        scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        contenido.getChildren().setAll(scroll);
+        });
         btnProductos.setOnAction(e -> mostrarSeccion("Productos y Categorías"));
         btnAlmacenes.setOnAction(e -> mostrarSeccion("Almacenes y Materiales"));
         btnProveedores.setOnAction(e -> mostrarSeccion("Proveedores y Compras"));
