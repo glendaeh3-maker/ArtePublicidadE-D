@@ -20,6 +20,22 @@
             <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/ArtePublicidadEDFinal.java</file>
             <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/RegistroForm.java</file>
             <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/VentanaPrincipal.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/ConexionBD.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/UsuarioControlador.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/Usuario.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/CategoriaProducto.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/Almacen.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/Material.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/Proovedor.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/Cotizacion.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/DetalleCotizacion.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/OrdenCompra.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/EntradaMaterial.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/UsoMaterial.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/Factura.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/Pago.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/PagoProovedor.java</file>
+            <file>file:/C:/Users/Genes/OneDrive/Documentos/NetBeansProjects/ArtePublicidadED(Final)/src/artepublicidaded/pkgfinal/ServicioEspecial.java</file>
         </group>
     </open-files>
 </project-private>

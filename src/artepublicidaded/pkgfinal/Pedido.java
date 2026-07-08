@@ -4,9 +4,7 @@
  */
 package artepublicidaded.pkgfinal;
 
-import artepublicidaded.pkgfinal.Empleado;
-import artepublicidaded.pkgfinal.DetallePedido;
-import artepublicidaded.pkgfinal.Cliente;
+
 import java.util.ArrayList;
 
 /**
@@ -27,7 +25,7 @@ public class Pedido {
     private String estado;
     private double total;
 
-    private ArrayList<DetallePedido> detalles;
+    private ArrayList<DetallePedido> detalles = new ArrayList<>();
 
     private static int contador = 1;
 
@@ -81,6 +79,29 @@ public class Pedido {
 
     // Getters y Setters
     public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    
+    public int getClienteId() { return cliente != null ? cliente.getId() : 0; }
+    public void setClienteId(int clienteId) {
+    if (this.cliente == null) this.cliente = new Cliente();
+    this.cliente.setId(clienteId);
+}
+
+    public int getEmpleadoId() { return empleado != null ? empleado.getId() : 0; }
+    public void setEmpleadoId(int empleadoId) {
+    if (this.empleado == null) this.empleado = new Empleado();
+    this.empleado.setId(empleadoId);
+}
+
+    public void setFechaPedido(java.time.LocalDate fecha) {
+    this.fechaPedido = fecha != null ? fecha.toString() : null;
+}
+
+    public void setFechaEntrega(java.time.LocalDate fecha) {
+    this.fechaEntrega = fecha != null ? fecha.toString() : null;
+}
+
+    public void setTotal(double total) { this.total = total; }
 
     public String getFechaPedido() { return fechaPedido; }
     public void setFechaPedido(String fechaPedido) { this.fechaPedido = fechaPedido; }
