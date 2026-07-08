@@ -84,11 +84,26 @@ public class ArtePublicidadEDFinal extends Application {
 
                 Usuario usuarioLogueado = UsuarioControlador.validarLogin(usuario, clave);
                 if (usuarioLogueado != null) {
-                    new VentanaPrincipal(stage, usuarioLogueado.getNombre());
-                } else {
-                    lblMensaje.setStyle("-fx-text-fill: red;");
-                    lblMensaje.setText("Usuario o contraseña incorrectos");
-                }
+                switch (usuarioLogueado.getRol()) {
+                case "ADMIN":
+                new VentanaPrincipalAdmin(stage, usuarioLogueado);
+                break;
+                case "EMPLEADO":
+                new VentanaPrincipal(stage, usuarioLogueado.getNombre());
+                break;
+                case "CLIENTE":
+                // Por ahora va al mismo dashboard, luego creamos el del cliente
+                new VentanaPrincipal(stage, usuarioLogueado.getNombre());
+                break;
+                default:
+                lblMensaje.setStyle("-fx-text-fill: red;");
+                lblMensaje.setText("Rol no reconocido");
+                break;
+    }
+} else {
+    lblMensaje.setStyle("-fx-text-fill: red;");
+    lblMensaje.setText("Usuario o contraseña incorrectos");
+}
             }
         });
 

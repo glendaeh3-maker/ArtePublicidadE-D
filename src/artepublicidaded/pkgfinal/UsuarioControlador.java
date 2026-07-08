@@ -25,6 +25,7 @@ public class UsuarioControlador {
             Usuario u = new Usuario();
             u.setId(rs.getInt("id"));
             u.setNombre(rs.getString("nombre"));
+            u.setApellidoPaterno(rs.getString("apellido_paterno"));
             u.setNombreUsuario(rs.getString("nombre_usuario"));
             u.setRol(rs.getString("rol"));
             con.close();
