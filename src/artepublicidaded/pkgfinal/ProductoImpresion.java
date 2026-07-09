@@ -22,7 +22,7 @@ public class ProductoImpresion extends Producto {
 
     @Override
     public String getCategoria() {
-        return "Impresion";
+        return "IMPRESION";
     }
 
     @Override

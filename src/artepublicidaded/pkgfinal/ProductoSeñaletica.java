@@ -27,7 +27,7 @@ public class ProductoSeñaletica extends Producto{
 
     @Override
     public String getCategoria() {
-        return "Senaletica";
+        return "SEÑALETICA";
     }
 
     @Override

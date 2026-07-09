@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
 
 /**
  *
@@ -22,7 +23,11 @@ public class OrdenCompraControlador {
             Connection con = ConexionBD.conectar();
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, orden.getIdProveedor());
+            if (orden.getIdEmpleado() > 0) {
             ps.setInt(2, orden.getIdEmpleado());
+            } else {
+            ps.setNull(2, java.sql.Types.INTEGER);
+            }
             ps.setDate(3, java.sql.Date.valueOf(orden.getFechaOrden()));
             ps.setString(4, orden.getEstado());
             ps.setDouble(5, orden.getTotal());

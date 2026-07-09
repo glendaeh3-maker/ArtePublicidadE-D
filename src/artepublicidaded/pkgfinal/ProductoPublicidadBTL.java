@@ -22,7 +22,7 @@ public class ProductoPublicidadBTL extends Producto {
 
     @Override
     public String getCategoria() {
-        return "Publicidad BTL";
+        return "BTL";
     }
 
     @Override

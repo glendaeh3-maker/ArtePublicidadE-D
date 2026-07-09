@@ -20,9 +20,10 @@ public class VentanaPrincipalAdmin {
     private Scene scene;
     private BorderPane root;
     private StackPane contenido;
+    private Usuario usuarioActual;
 
     public VentanaPrincipalAdmin(Stage stage, Usuario usuario) {
-
+        this.usuarioActual = usuario;
         root = new BorderPane();
 
         // ===== SIDEBAR =====
@@ -48,7 +49,6 @@ public class VentanaPrincipalAdmin {
         Button btnAlmacenes = crearBotonMenu("Almacenes y Materiales");
         Button btnProveedores = crearBotonMenu("Proveedores y Compras");
         Button btnFacturacion = crearBotonMenu("Facturación y Pagos");
-        Button btnServicios = crearBotonMenu("Servicios Especiales");
         Button btnReportes = crearBotonMenu("Reportes");
 
         Region espacio = new Region();
@@ -65,7 +65,6 @@ public class VentanaPrincipalAdmin {
             btnAlmacenes,
             btnProveedores,
             btnFacturacion,
-            btnServicios,
             btnReportes,
             espacio,
             btnSalir
@@ -92,11 +91,19 @@ public class VentanaPrincipalAdmin {
         scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
         contenido.getChildren().setAll(scroll);
         });
-        btnProductos.setOnAction(e -> mostrarSeccion("Productos y Categorías"));
-        btnAlmacenes.setOnAction(e -> mostrarSeccion("Almacenes y Materiales"));
-        btnProveedores.setOnAction(e -> mostrarSeccion("Proveedores y Compras"));
+        btnProductos.setOnAction(e -> {
+        ProductosPanel panel = new ProductosPanel();
+        contenido.getChildren().setAll(panel.getPanel());
+        });
+        btnAlmacenes.setOnAction(e -> {
+        AlmacenesPanel panel = new AlmacenesPanel();
+        contenido.getChildren().setAll(panel.getPanel());
+        });
+        btnProveedores.setOnAction(e -> {
+        ProveedoresPanel panel = new ProveedoresPanel(usuarioActual);
+        contenido.getChildren().setAll(panel.getPanel());
+        });
         btnFacturacion.setOnAction(e -> mostrarSeccion("Facturación y Pagos"));
-        btnServicios.setOnAction(e -> mostrarSeccion("Servicios Especiales"));
         btnReportes.setOnAction(e -> mostrarSeccion("Reportes"));
 
         btnSalir.setOnAction(new EventHandler<ActionEvent>() {

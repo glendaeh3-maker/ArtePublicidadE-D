@@ -23,7 +23,7 @@ public class ProductoDiseñoGrafico extends Producto{
 
     @Override
     public String getCategoria() {
-        return "Diseno Grafico";
+        return "DISEÑO_GRAFICO";
     }
 
     @Override
