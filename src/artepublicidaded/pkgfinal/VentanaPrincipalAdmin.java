@@ -103,8 +103,14 @@ public class VentanaPrincipalAdmin {
         ProveedoresPanel panel = new ProveedoresPanel(usuarioActual);
         contenido.getChildren().setAll(panel.getPanel());
         });
-        btnFacturacion.setOnAction(e -> mostrarSeccion("Facturación y Pagos"));
-        btnReportes.setOnAction(e -> mostrarSeccion("Reportes"));
+        btnFacturacion.setOnAction(e -> {
+        FacturacionPanel panel = new FacturacionPanel();
+        contenido.getChildren().setAll(panel.getPanel());
+        });
+        btnReportes.setOnAction(e -> {
+        ReportesPanel panel = new ReportesPanel();
+        contenido.getChildren().setAll(panel.getPanel());
+        });
 
         btnSalir.setOnAction(new EventHandler<ActionEvent>() {
             @Override

@@ -92,8 +92,7 @@ public class ArtePublicidadEDFinal extends Application {
                 new VentanaPrincipal(stage, usuarioLogueado.getNombre());
                 break;
                 case "CLIENTE":
-                // Por ahora va al mismo dashboard, luego creamos el del cliente
-                new VentanaPrincipal(stage, usuarioLogueado.getNombre());
+                new VentanaPrincipalCliente(stage, usuarioLogueado);
                 break;
                 default:
                 lblMensaje.setStyle("-fx-text-fill: red;");
