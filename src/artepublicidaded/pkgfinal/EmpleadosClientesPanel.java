@@ -17,15 +17,34 @@ import javafx.scene.layout.*;
  */
 public class EmpleadosClientesPanel {
     public VBox getPanel() {
+        return getPanel("Empleados");
+    }
+
+     public VBox getPanel(String filtroInicial) {
+        return getPanel(filtroInicial, false);
+    }
+
+    // Vista simplificada: solo Clientes, sin opción de ver Empleados
+    public VBox getPanelSoloClientes() {
+        return getPanel("Clientes", true);
+    }
+
+    public VBox getPanel(String filtroInicial, boolean soloClientes) {
         VBox vista = new VBox(20);
         vista.setPadding(new Insets(10));
 
-        Label lblTitulo = new Label("Empleados y Clientes");
+        Label lblTitulo = new Label(soloClientes ? "Clientes" : "Empleados y Clientes");
         lblTitulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a237e;");
 
         ComboBox<String> cmbFiltro = new ComboBox<>();
-        cmbFiltro.getItems().addAll("Empleados", "Clientes");
-        cmbFiltro.setValue("Empleados");
+        if (soloClientes) {
+            cmbFiltro.getItems().add("Clientes");
+        } else {
+            cmbFiltro.getItems().addAll("Empleados", "Clientes");
+        }
+        cmbFiltro.setValue(filtroInicial);
+        cmbFiltro.setVisible(!soloClientes);
+        cmbFiltro.setManaged(!soloClientes);
         cmbFiltro.setStyle("-fx-pref-height: 35px; -fx-background-radius: 6;");
 
         TextField txtBuscar = new TextField();
@@ -176,6 +195,15 @@ public class EmpleadosClientesPanel {
                 cmbFiltro.setValue("Empleados");
             });
          });
+// ===== BOTÓN NUEVO CLIENTE =====
+        Button btnNuevoCliente = new Button("+ Nuevo Cliente");
+        btnNuevoCliente.setStyle("-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-pref-height: 35px; -fx-background-radius: 6; -fx-cursor: hand;");
+
+        btnNuevoCliente.setOnAction(e -> {
+            abrirNuevoCliente(btnNuevoCliente.getScene().getWindow());
+            cargarDatos(tabla, colDni, colNombre, colApellidoP, colApellidoM,
+                        colTelefono, colCorreo, colExtra, cmbFiltro.getValue());
+        });
 
         // ===== BOTONES =====
         Button btnEliminar = new Button("Eliminar");
@@ -184,12 +212,14 @@ public class EmpleadosClientesPanel {
         Button btnRefrescar = new Button("Refrescar");
         btnRefrescar.setStyle("-fx-background-color: #388e3c; -fx-text-fill: white; -fx-pref-height: 35px; -fx-background-radius: 6; -fx-cursor: hand;");
 
-        HBox botones = new HBox(10, btnNuevoEmpleado, btnEliminar, btnRefrescar);
+        HBox botones = soloClientes
+            ? new HBox(10, btnNuevoCliente, btnEliminar, btnRefrescar)
+            : new HBox(10, btnNuevoEmpleado, btnNuevoCliente, btnEliminar, btnRefrescar);
         botones.setAlignment(Pos.CENTER_LEFT);
 
         // ===== CARGAR DATOS =====
         cargarDatos(tabla, colDni, colNombre, colApellidoP, colApellidoM,
-                    colTelefono, colCorreo, colExtra, "Empleados");
+                    colTelefono, colCorreo, colExtra, filtroInicial);
 
         cmbFiltro.setOnAction(e -> {
             txtBuscar.clear();
@@ -288,6 +318,99 @@ public class EmpleadosClientesPanel {
         alert.setTitle("Aviso");
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+    // ===== Método público: permite abrir el formulario "Nuevo Cliente" desde otras pantallas =====
+    public void abrirNuevoCliente(javafx.stage.Window owner) {
+        Dialog<Cliente> dialog = new Dialog<>();
+        dialog.setTitle("Nuevo Cliente");
+        dialog.setHeaderText("Ingresa los datos del cliente");
+        dialog.initOwner(owner);
+
+        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnCancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, btnCancelar);
+
+        TextField fDni = new TextField(); fDni.setPromptText("DNI (8 dígitos)");
+        TextField fNombre = new TextField(); fNombre.setPromptText("Nombre");
+        TextField fApellidoP = new TextField(); fApellidoP.setPromptText("Apellido Paterno");
+        TextField fApellidoM = new TextField(); fApellidoM.setPromptText("Apellido Materno");
+        TextField fTelefono = new TextField(); fTelefono.setPromptText("Teléfono (9 dígitos)");
+        TextField fCorreo = new TextField(); fCorreo.setPromptText("Correo");
+        TextField fDireccion = new TextField(); fDireccion.setPromptText("Dirección");
+        TextField fUsuario = new TextField(); fUsuario.setPromptText("Nombre de usuario");
+        PasswordField fClave = new PasswordField(); fClave.setPromptText("Contraseña");
+
+        fDni.textProperty().addListener((obs, oldText, newText) -> {
+            if (!newText.matches("\\d*")) fDni.setText(newText.replaceAll("[^\\d]", ""));
+            if (fDni.getText().length() > 8) fDni.setText(fDni.getText().substring(0, 8));
+        });
+
+        fTelefono.textProperty().addListener((obs, oldText, newText) -> {
+            if (!newText.matches("\\d*")) fTelefono.setText(newText.replaceAll("[^\\d]", ""));
+            if (fTelefono.getText().length() > 9) fTelefono.setText(fTelefono.getText().substring(0, 9));
+        });
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        grid.add(new Label("DNI:"), 0, 0); grid.add(fDni, 1, 0);
+        grid.add(new Label("Nombre:"), 0, 1); grid.add(fNombre, 1, 1);
+        grid.add(new Label("Ap. Paterno:"), 0, 2); grid.add(fApellidoP, 1, 2);
+        grid.add(new Label("Ap. Materno:"), 0, 3); grid.add(fApellidoM, 1, 3);
+        grid.add(new Label("Teléfono:"), 0, 4); grid.add(fTelefono, 1, 4);
+        grid.add(new Label("Correo:"), 0, 5); grid.add(fCorreo, 1, 5);
+        grid.add(new Label("Dirección:"), 0, 6); grid.add(fDireccion, 1, 6);
+        grid.add(new Label("Usuario:"), 0, 7); grid.add(fUsuario, 1, 7);
+        grid.add(new Label("Contraseña:"), 0, 8); grid.add(fClave, 1, 8);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == btnGuardar) {
+                if (fDni.getText().length() != 8) {
+                    mostrarAlerta("El DNI debe tener exactamente 8 dígitos");
+                    return null;
+                }
+                if (fTelefono.getText().length() != 9) {
+                    mostrarAlerta("El teléfono debe tener exactamente 9 dígitos");
+                    return null;
+                }
+                if (!fCorreo.getText().matches("^[\\w.+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+                    mostrarAlerta("El correo no es válido");
+                    return null;
+                }
+                if (fNombre.getText().isEmpty() || fUsuario.getText().isEmpty() || fClave.getText().isEmpty()) {
+                    mostrarAlerta("Completa los campos obligatorios");
+                    return null;
+                }
+
+                boolean creado = UsuarioControlador.registrarCliente(
+                    fDni.getText(), fNombre.getText(), fApellidoP.getText(),
+                    fApellidoM.getText(), fTelefono.getText(), fCorreo.getText(),
+                    fDireccion.getText(), fUsuario.getText(), fClave.getText()
+                );
+
+                if (!creado) {
+                    mostrarAlerta("El DNI o usuario ya existe en el sistema");
+                    return null;
+                }
+
+                Cliente cli = new Cliente();
+                cli.setDni(fDni.getText());
+                cli.setNombre(fNombre.getText());
+                cli.setApellido_paterno(fApellidoP.getText());
+                cli.setApellido_materno(fApellidoM.getText());
+                cli.setTelefono(fTelefono.getText());
+                cli.setCorreo(fCorreo.getText());
+                cli.setDireccion(fDireccion.getText());
+                return cli;
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
     }
 }
 

@@ -51,12 +51,16 @@ public class UsuarioControlador {
         if (rs.next()) {
             Usuario u = new Usuario();
             u.setId(rs.getInt("id"));
+            u.setDni(rs.getString("dni"));
             u.setNombre(rs.getString("nombre"));
             u.setApellidoPaterno(rs.getString("apellido_paterno"));
+            u.setApellidoMaterno(rs.getString("apellido_materno")); 
+            u.setTelefono(rs.getString("telefono"));               
+            u.setCorreo(rs.getString("correo"));                   
             u.setNombreUsuario(rs.getString("nombre_usuario"));
             u.setRol(rs.getString("rol"));
             con.close();
-            return u; // Devuelve el objeto completo
+            return u;
         }
         con.close();
     } catch (SQLException e) {

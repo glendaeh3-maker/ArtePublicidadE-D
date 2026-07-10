@@ -96,6 +96,33 @@ public class ClienteControlador {
         }
         return null;
     }
+    // ===== Buscar cliente por ID =====
+    public static Cliente buscarPorId(int id) {
+        String sql = "SELECT * FROM cliente WHERE id = ?";
+        try {
+            Connection con = ConexionBD.conectar();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Cliente c = new Cliente();
+                c.setId(rs.getInt("id"));
+                c.setDni(rs.getString("dni"));
+                c.setNombre(rs.getString("nombre"));
+                c.setApellido_paterno(rs.getString("apellido_paterno"));
+                c.setApellido_materno(rs.getString("apellido_materno"));
+                c.setTelefono(rs.getString("telefono"));
+                c.setCorreo(rs.getString("correo"));
+                c.setDireccion(rs.getString("direccion"));
+                con.close();
+                return c;
+            }
+            con.close();
+        } catch (SQLException e) {
+            System.out.println("Error al buscar cliente por id: " + e.getMessage());
+        }
+        return null;
+    }
 
     // ===== Actualizar cliente =====
     public static boolean actualizar(Cliente cliente) {

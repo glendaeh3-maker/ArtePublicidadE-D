@@ -42,7 +42,7 @@ public class ReportesPanel {
     private Tab crearTabPedidosPorEstado() {
         Tab tab = new Tab("Pedidos por Estado");
 
-        Map<String, Integer> conteo = new HashMap<>();
+        Map<String, Integer> conteo = new LinkedHashMap<>();
         conteo.put("PENDIENTE", 0);
         conteo.put("EN PROCESO", 0);
         conteo.put("COMPLETADO", 0);
@@ -61,7 +61,7 @@ public class ReportesPanel {
         grafico.setTitle("Pedidos por Estado");
         grafico.setLegendVisible(false);
         grafico.setAnimated(false);
-        grafico.setPrefHeight(350);
+        grafico.setPrefHeight(320);
 
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
         for (Map.Entry<String, Integer> entry : conteo.entrySet()) {
@@ -69,7 +69,21 @@ public class ReportesPanel {
         }
         grafico.getData().add(serie);
 
-        tab.setContent(new VBox(grafico));
+        // ===== Números debajo del gráfico, uno por estado =====
+        HBox resumen = new HBox(15);
+        resumen.setAlignment(Pos.CENTER);
+        String[] colores = {"#f57c00", "#1976d2", "#388e3c", "#c62828"};
+        int i = 0;
+        for (Map.Entry<String, Integer> entry : conteo.entrySet()) {
+            resumen.getChildren().add(
+                crearTarjetaReporte(entry.getKey(), "", String.valueOf(entry.getValue()), colores[i % colores.length])
+            );
+            i++;
+        }
+
+        VBox contenido = new VBox(15, grafico, resumen);
+        contenido.setPadding(new Insets(10));
+        tab.setContent(contenido);
         return tab;
     }
 
@@ -98,15 +112,32 @@ public class ReportesPanel {
         grafico.setTitle("Ventas por Mes");
         grafico.setLegendVisible(false);
         grafico.setAnimated(false);
-        grafico.setPrefHeight(350);
+        grafico.setPrefHeight(320);
 
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
+        double totalAnio = 0;
+        String mesTope = "-";
+        double ventaMesTope = -1;
         for (Map.Entry<String, Double> entry : ventasPorMes.entrySet()) {
             serie.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+            totalAnio += entry.getValue();
+            if (entry.getValue() > ventaMesTope) {
+                ventaMesTope = entry.getValue();
+                mesTope = entry.getKey();
+            }
         }
         grafico.getData().add(serie);
 
-        tab.setContent(new VBox(grafico));
+        // ===== Números debajo del gráfico: total del año y mejor mes =====
+        HBox resumen = new HBox(15,
+            crearTarjetaReporte("Total del Año", "", "S/ " + String.format("%.2f", totalAnio), "#2e7d32"),
+            crearTarjetaReporte("Mejor Mes", mesTope, "S/ " + String.format("%.2f", Math.max(ventaMesTope, 0)), "#1976d2")
+        );
+        resumen.setAlignment(Pos.CENTER);
+
+        VBox contenido = new VBox(15, grafico, resumen);
+        contenido.setPadding(new Insets(10));
+        tab.setContent(contenido);
         return tab;
     }
 
@@ -115,33 +146,52 @@ public class ReportesPanel {
         Tab tab = new Tab("Clientes Frecuentes");
 
         Map<Integer, Integer> pedidosPorCliente = new HashMap<>();
+        Map<Integer, Double> totalPorCliente = new HashMap<>();
+
         for (Pedido p : PedidoControlador.listar()) {
-            pedidosPorCliente.put(p.getClienteId(),
-                pedidosPorCliente.getOrDefault(p.getClienteId(), 0) + 1);
+            int idCliente = p.getClienteId();
+            pedidosPorCliente.put(idCliente, pedidosPorCliente.getOrDefault(idCliente, 0) + 1);
+            totalPorCliente.put(idCliente, totalPorCliente.getOrDefault(idCliente, 0.0) + p.getTotal());
         }
 
-        TableView<Map.Entry<String, Integer>> tabla = new TableView<>();
+        List<Object[]> lista = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : pedidosPorCliente.entrySet()) {
+            int idCliente = entry.getKey();
+            Cliente c = ClienteControlador.buscarPorId(idCliente);
+            String nombre = (c != null) ? c.getNombre() + " " + c.getApellido_paterno() : "Cliente #" + idCliente;
+            double total = totalPorCliente.getOrDefault(idCliente, 0.0);
+            lista.add(new Object[]{nombre, entry.getValue(), total});
+        }
+        lista.sort((a, b) -> (Integer) b[1] - (Integer) a[1]);
+
+        if (lista.isEmpty()) {
+            Label lblSinDatos = new Label("Todavía no hay pedidos registrados para calcular clientes frecuentes.");
+            lblSinDatos.setStyle("-fx-font-size: 13px; -fx-text-fill: #999;");
+            VBox contenido = new VBox(10, lblSinDatos);
+            contenido.setPadding(new Insets(10));
+            tab.setContent(contenido);
+            return tab;
+        }
+
+        TableView<Object[]> tabla = new TableView<>();
         tabla.setPrefHeight(350);
 
-        TableColumn<Map.Entry<String, Integer>, String> colCliente = new TableColumn<>("Cliente");
-        colCliente.setPrefWidth(300);
+        TableColumn<Object[], String> colCliente = new TableColumn<>("Cliente");
+        colCliente.setPrefWidth(250);
         colCliente.setCellValueFactory(data ->
-            new javafx.beans.property.SimpleStringProperty(data.getValue().getKey()));
+            new javafx.beans.property.SimpleStringProperty((String) data.getValue()[0]));
 
-        TableColumn<Map.Entry<String, Integer>, String> colPedidos = new TableColumn<>("Total Pedidos");
-        colPedidos.setPrefWidth(150);
+        TableColumn<Object[], String> colPedidos = new TableColumn<>("Total Pedidos");
+        colPedidos.setPrefWidth(120);
         colPedidos.setCellValueFactory(data ->
-            new javafx.beans.property.SimpleStringProperty(String.valueOf(data.getValue().getValue())));
+            new javafx.beans.property.SimpleStringProperty(String.valueOf(data.getValue()[1])));
 
-        tabla.getColumns().addAll(colCliente, colPedidos);
+        TableColumn<Object[], String> colTotal = new TableColumn<>("Total Comprado");
+        colTotal.setPrefWidth(150);
+        colTotal.setCellValueFactory(data ->
+            new javafx.beans.property.SimpleStringProperty("S/ " + String.format("%.2f", (Double) data.getValue()[2])));
 
-        List<Map.Entry<String, Integer>> lista = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> entry : pedidosPorCliente.entrySet()) {
-            Cliente c = ClienteControlador.buscarPorDni(String.valueOf(entry.getKey()));
-            String nombre = c != null ? c.getNombre() + " " + c.getApellido_paterno() : "ID: " + entry.getKey();
-            lista.add(new AbstractMap.SimpleEntry<>(nombre, entry.getValue()));
-        }
-        lista.sort((a, b) -> b.getValue() - a.getValue());
+        tabla.getColumns().addAll(colCliente, colPedidos, colTotal);
         tabla.setItems(FXCollections.observableArrayList(lista));
 
         tab.setContent(new VBox(tabla));

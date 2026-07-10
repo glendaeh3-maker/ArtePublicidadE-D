@@ -26,9 +26,12 @@ public class VentanaPrincipal {
     private Scene scene;
     private BorderPane root;
     private StackPane contenido; // Aquí se carga cada sección
+    private Usuario usuarioActual;
+    private Stage stage;
 
-    public VentanaPrincipal(Stage stage, String nombreUsuario) {
-
+        public VentanaPrincipal(Stage stage, Usuario usuario) {
+        this.usuarioActual = usuario;
+        this.stage = stage;
         root = new BorderPane();
 
         // ===== SIDEBAR =====
@@ -39,7 +42,7 @@ public class VentanaPrincipal {
         Label lblLogo = new Label("ARTE Y PUBLICIDAD");
         lblLogo.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        Label lblUsuario = new Label(nombreUsuario);
+        Label lblUsuario = new Label(usuario.getNombre());
         lblUsuario.setStyle("-fx-font-size: 12px; -fx-text-fill: #c8e6c9;");
 
         VBox encabezado = new VBox(2, lblLogo, lblUsuario);
@@ -78,10 +81,30 @@ public class VentanaPrincipal {
 
         // ===== EVENTOS DE NAVEGACIÓN =====
         btnPanelPrincipal.setOnAction(e -> mostrarPanelPrincipal());
-        btnPedidos.setOnAction(e -> mostrarSeccion("Pedidos"));
-        btnClientes.setOnAction(e -> mostrarSeccion("Clientes"));
-        btnProductos.setOnAction(e -> mostrarSeccion("Productos"));
-        btnPerfil.setOnAction(e -> mostrarSeccion("Mi Perfil"));
+        btnPedidos.setOnAction(e -> {
+        PedidosPanel panel = new PedidosPanel(usuarioActual);
+        contenido.getChildren().setAll(panel.getPanel());
+        });
+        btnClientes.setOnAction(e -> {
+        EmpleadosClientesPanel panel = new EmpleadosClientesPanel();
+        VBox panelVista = panel.getPanelSoloClientes();
+        ScrollPane scroll = new ScrollPane(panelVista);
+        scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        contenido.getChildren().setAll(scroll);
+        });
+        btnProductos.setOnAction(e -> {
+        ProductosPanel panel = new ProductosPanel();
+        contenido.getChildren().setAll(panel.getPanel());
+        });
+        btnPerfil.setOnAction(e -> {
+        PerfilPanel panel = new PerfilPanel(usuarioActual);
+        ScrollPane scroll = new ScrollPane(panel.getPanel());
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        contenido.getChildren().setAll(scroll);
+        });
 
         btnSalir.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -160,8 +183,24 @@ private void mostrarPanelPrincipal() {
         "-fx-pref-width: 220px; -fx-pref-height: 38px; -fx-background-radius: 6; -fx-cursor: hand;"
     );
 
-    btnNuevoPedido.setOnAction(e -> mostrarSeccion("Pedidos"));
-    btnRegistrarCliente.setOnAction(e -> mostrarSeccion("Clientes"));
+    // ===== BOTÓN "Nuevo Pedido": abre directamente el formulario real de PedidosPanel =====
+    btnNuevoPedido.setOnAction(e -> {
+        PedidosPanel panel = new PedidosPanel(usuarioActual);
+        contenido.getChildren().setAll(panel.getPanel());
+        panel.abrirNuevoPedido(stage);
+    });
+
+    // ===== BOTÓN "Registrar Cliente": abre directamente el formulario real de EmpleadosClientesPanel =====
+    btnRegistrarCliente.setOnAction(e -> {
+        EmpleadosClientesPanel panel = new EmpleadosClientesPanel();
+        VBox panelVista = panel.getPanelSoloClientes();
+        ScrollPane scroll = new ScrollPane(panelVista);
+        scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        contenido.getChildren().setAll(scroll);
+        panel.abrirNuevoCliente(stage);
+    });
 
     VBox accesos = new VBox(12, lblAccesos, btnNuevoPedido, btnRegistrarCliente);
     accesos.setAlignment(Pos.CENTER_LEFT);
@@ -170,14 +209,18 @@ private void mostrarPanelPrincipal() {
         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
     );
 
-    // ===== Tarjetas pequeñas =====
+    // ===== Tarjetas pequeñas con datos reales =====
+    int pedidosPendientes = PedidoControlador.contarPorEstado("PENDIENTE");
+    double ventasHoy = PedidoControlador.sumaVentasHoy();
+    int pedidosListos = PedidoControlador.contarPorEstado("COMPLETADO");
+
     HBox tarjetasFila = new HBox(15,
-        crearTarjeta("Pedidos Pendientes", "0"),
-        crearTarjeta("Ventas Hoy", "S/ 0.00"),
-        crearTarjeta("Pedidos Listos", "0")
+        crearTarjeta("Pedidos Pendientes", String.valueOf(pedidosPendientes)),
+        crearTarjeta("Ventas Hoy", "S/ " + String.format("%.2f", ventasHoy)),
+        crearTarjeta("Pedidos Listos", String.valueOf(pedidosListos))
     );
 
-    // ===== Gráfico: Pedidos por Estado =====
+    // ===== Gráfico: Pedidos por Estado (datos reales de MySQL) =====
     Label lblGrafico = new Label("Pedidos por Estado");
     lblGrafico.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
 
@@ -192,28 +235,42 @@ private void mostrarPanelPrincipal() {
     grafico.setLegendVisible(true);
     grafico.setAnimated(false);
 
-    // Datos de ejemplo (luego se reemplazan con datos reales de MySQL)
-    XYChart.Series<String, Number> serieEnProceso = new XYChart.Series<>();
-    serieEnProceso.setName("En Proceso");
-    serieEnProceso.getData().add(new XYChart.Data<>("Ene", 5));
-    serieEnProceso.getData().add(new XYChart.Data<>("Feb", 8));
-    serieEnProceso.getData().add(new XYChart.Data<>("Mar", 6));
+    java.util.Map<String, java.util.Map<String, Integer>> datos = PedidoControlador.conteoPorMesYEstado();
 
-    XYChart.Series<String, Number> serieListo = new XYChart.Series<>();
-    serieListo.setName("Listo");
-    serieListo.getData().add(new XYChart.Data<>("Ene", 3));
-    serieListo.getData().add(new XYChart.Data<>("Feb", 6));
-    serieListo.getData().add(new XYChart.Data<>("Mar", 9));
+    VBox tarjetaGrafico;
 
-    XYChart.Series<String, Number> serieEntregado = new XYChart.Series<>();
-    serieEntregado.setName("Entregado");
-    serieEntregado.getData().add(new XYChart.Data<>("Ene", 7));
-    serieEntregado.getData().add(new XYChart.Data<>("Feb", 4));
-    serieEntregado.getData().add(new XYChart.Data<>("Mar", 10));
+    if (datos.isEmpty()) {
+        // Aún no hay pedidos registrados en la base de datos
+        Label lblSinDatos = new Label("Todavía no hay pedidos registrados para mostrar en el gráfico.");
+        lblSinDatos.setStyle("-fx-font-size: 13px; -fx-text-fill: #999;");
+        tarjetaGrafico = new VBox(10, lblGrafico, lblSinDatos);
+    } else {
+        XYChart.Series<String, Number> seriePendiente = new XYChart.Series<>();
+        seriePendiente.setName("Pendiente");
 
-    grafico.getData().addAll(serieEnProceso, serieListo, serieEntregado);
+        XYChart.Series<String, Number> serieEnProceso = new XYChart.Series<>();
+        serieEnProceso.setName("En Proceso");
 
-    VBox tarjetaGrafico = new VBox(10, lblGrafico, grafico);
+        XYChart.Series<String, Number> serieCompletado = new XYChart.Series<>();
+        serieCompletado.setName("Completado");
+
+        XYChart.Series<String, Number> serieCancelado = new XYChart.Series<>();
+        serieCancelado.setName("Cancelado");
+
+        for (java.util.Map.Entry<String, java.util.Map<String, Integer>> entry : datos.entrySet()) {
+            String mes = entry.getKey();
+            java.util.Map<String, Integer> porEstado = entry.getValue();
+
+            seriePendiente.getData().add(new XYChart.Data<>(mes, porEstado.getOrDefault("PENDIENTE", 0)));
+            serieEnProceso.getData().add(new XYChart.Data<>(mes, porEstado.getOrDefault("EN PROCESO", 0)));
+            serieCompletado.getData().add(new XYChart.Data<>(mes, porEstado.getOrDefault("COMPLETADO", 0)));
+            serieCancelado.getData().add(new XYChart.Data<>(mes, porEstado.getOrDefault("CANCELADO", 0)));
+        }
+
+        grafico.getData().addAll(seriePendiente, serieEnProceso, serieCompletado, serieCancelado);
+        tarjetaGrafico = new VBox(10, lblGrafico, grafico);
+    }
+
     tarjetaGrafico.setStyle(
         "-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; " +
         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
@@ -228,27 +285,20 @@ private void mostrarPanelPrincipal() {
     contenido.getChildren().setAll(scroll);
 }
 
-private VBox crearTarjeta(String titulo, String valor) {
-    Label lblValor = new Label(valor);
-    lblValor.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;");
+    private VBox crearTarjeta(String titulo, String valor) {
+        Label lblValor = new Label(valor);
+        lblValor.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;");
 
-    Label lblTitulo = new Label(titulo);
-    lblTitulo.setStyle("-fx-font-size: 12px; -fx-text-fill: #777;");
+        Label lblTitulo = new Label(titulo);
+        lblTitulo.setStyle("-fx-font-size: 12px; -fx-text-fill: #777;");
 
-    VBox tarjeta = new VBox(5, lblValor, lblTitulo);
-    tarjeta.setStyle(
-        "-fx-background-color: white; -fx-padding: 18; -fx-background-radius: 10; " +
-        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
-    );
-    tarjeta.setPrefWidth(180);
-    return tarjeta;
-}
-
-    // ===== Vista genérica para las demás secciones (placeholder) =====
-    private void mostrarSeccion(String nombreSeccion) {
-        Label lbl = new Label(nombreSeccion);
-        lbl.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;");
-        contenido.getChildren().setAll(lbl);
+        VBox tarjeta = new VBox(5, lblValor, lblTitulo);
+        tarjeta.setStyle(
+            "-fx-background-color: white; -fx-padding: 18; -fx-background-radius: 10; " +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
+        );
+        tarjeta.setPrefWidth(180);
+        return tarjeta;
     }
 
     public Scene getScene() {

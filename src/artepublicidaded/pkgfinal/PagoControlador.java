@@ -59,6 +59,16 @@ public class PagoControlador {
         }
         return lista;
     }
+    // ===== Suma total de pagos completados (para el Dashboard del Admin) =====
+    public static double sumaTotalCompletado() {
+        double total = 0;
+        for (Pago p : listar()) {
+            if ("COMPLETADO".equalsIgnoreCase(p.getEstado())) {
+                total += p.getMonto();
+            }
+        }
+        return total;
+    }
 
     // ===== Actualizar estado pago =====
     public static boolean actualizarEstado(int idPago, String estado) {

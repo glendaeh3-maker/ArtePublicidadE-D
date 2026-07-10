@@ -172,12 +172,17 @@ public class VentanaPrincipalAdmin {
         Label lblSubtitulo = new Label("Panel de Administración — Arte y Publicidad E&D");
         lblSubtitulo.setStyle("-fx-font-size: 13px; -fx-text-fill: #777;");
 
-        // Tarjetas de resumen
+        // Tarjetas de resumen con datos reales
+        int totalClientes = ClienteControlador.listar().size();
+        int totalEmpleados = EmpleadoControlador.listar().size();
+        int pedidosHoy = PedidoControlador.contarPedidosHoy();
+        double facturacionTotal = PagoControlador.sumaTotalCompletado();
+
         HBox tarjetas = new HBox(15,
-            crearTarjeta("Clientes", "0"),
-            crearTarjeta("Empleados", "0"),
-            crearTarjeta("Pedidos Hoy", "0"),
-            crearTarjeta("Facturación", "S/ 0.00")
+            crearTarjeta("Clientes", String.valueOf(totalClientes)),
+            crearTarjeta("Empleados", String.valueOf(totalEmpleados)),
+            crearTarjeta("Pedidos Hoy", String.valueOf(pedidosHoy)),
+            crearTarjeta("Facturación", "S/ " + String.format("%.2f", facturacionTotal))
         );
 
         vista.getChildren().addAll(lblBienvenida, lblSubtitulo, tarjetas);

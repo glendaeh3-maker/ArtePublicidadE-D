@@ -89,7 +89,7 @@ public class ArtePublicidadEDFinal extends Application {
                 new VentanaPrincipalAdmin(stage, usuarioLogueado);
                 break;
                 case "EMPLEADO":
-                new VentanaPrincipal(stage, usuarioLogueado.getNombre());
+                new VentanaPrincipal(stage, usuarioLogueado);
                 break;
                 case "CLIENTE":
                 new VentanaPrincipalCliente(stage, usuarioLogueado);

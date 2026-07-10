@@ -43,9 +43,9 @@ public class VentanaPrincipalCliente {
         VBox encabezado = new VBox(2, lblLogo, lblRol, lblNombre);
         encabezado.setStyle("-fx-padding: 0 0 25 0;");
 
-        Button btnMisPedidos = crearBotonMenu("📦 Mis Pedidos");
-        Button btnNuevoPedido = crearBotonMenu("➕ Nuevo Pedido");
-        Button btnMiPerfil = crearBotonMenu("👤 Mi Perfil");
+        Button btnMisPedidos = crearBotonMenu("Mis Pedidos");
+        Button btnNuevoPedido = crearBotonMenu("Nuevo Pedido");
+        Button btnMiPerfil = crearBotonMenu("Mi Perfil");
 
         Region espacio = new Region();
         VBox.setVgrow(espacio, Priority.ALWAYS);
@@ -66,12 +66,13 @@ public class VentanaPrincipalCliente {
         contenido = new StackPane();
         contenido.setStyle("-fx-background-color: #f5f5f5;");
         contenido.setPadding(new Insets(20));
+        
 
         mostrarPanelPrincipal(usuario);
 
         // ===== EVENTOS =====
         btnMisPedidos.setOnAction(e -> mostrarMisPedidos(usuario));
-        btnNuevoPedido.setOnAction(e -> mostrarSeccion("Nuevo Pedido — próximamente"));
+        btnNuevoPedido.setOnAction(e -> mostrarCatalogo(usuario, stage));
         btnMiPerfil.setOnAction(e -> mostrarMiPerfil(usuario));
 
         btnSalir.setOnAction(new EventHandler<ActionEvent>() {
@@ -237,6 +238,190 @@ public class VentanaPrincipalCliente {
         tarjeta.setPrefWidth(160);
         return tarjeta;
     }
+    private void mostrarCatalogo(Usuario usuario, Stage stage) {
+    VBox vista = new VBox(20);
+    vista.setPadding(new Insets(10));
+
+    Label lblTitulo = new Label("Catálogo de Productos");
+    lblTitulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;");
+
+    // ===== FILTRO =====
+    ComboBox<String> cmbCategoria = new ComboBox<>();
+    cmbCategoria.getItems().addAll("TODOS", "IMPRESION", "SEÑALETICA", "BTL", "DISEÑO_GRAFICO");
+    cmbCategoria.setValue("TODOS");
+    cmbCategoria.setStyle("-fx-pref-height: 35px;");
+
+    HBox barraBusqueda = new HBox(10, new Label("Categoría:"), cmbCategoria);
+    barraBusqueda.setAlignment(Pos.CENTER_LEFT);
+
+    // ===== TABLA DE PRODUCTOS =====
+    TableView<Producto> tablaProductos = new TableView<>();
+    tablaProductos.setPrefHeight(250);
+
+    TableColumn<Producto, String> colCodigo = new TableColumn<>("Código");
+    colCodigo.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+        data.getValue().getCodigo()));
+    colCodigo.setPrefWidth(80);
+
+    TableColumn<Producto, String> colNombre = new TableColumn<>("Producto");
+    colNombre.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+        data.getValue().getNombreProducto()));
+    colNombre.setPrefWidth(200);
+
+    TableColumn<Producto, String> colDescripcion = new TableColumn<>("Descripción");
+    colDescripcion.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+        data.getValue().getDescripcion()));
+    colDescripcion.setPrefWidth(250);
+
+    TableColumn<Producto, String> colPrecio = new TableColumn<>("Precio");
+    colPrecio.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+        "S/ " + String.format("%.2f", data.getValue().getPrecioUnitario())));
+    colPrecio.setPrefWidth(90);
+
+    TableColumn<Producto, String> colCategoria = new TableColumn<>("Categoría");
+    colCategoria.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+        data.getValue().getCategoria()));
+    colCategoria.setPrefWidth(120);
+
+    tablaProductos.getColumns().addAll(colCodigo, colNombre, colDescripcion, colPrecio, colCategoria);
+
+    // Cargar productos
+    cargarProductos(tablaProductos, "TODOS");
+    cmbCategoria.setOnAction(e -> cargarProductos(tablaProductos, cmbCategoria.getValue()));
+
+    // ===== FORMULARIO DE PEDIDO =====
+    Label lblPedido = new Label("Solicitar Pedido");
+    lblPedido.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+    TextField fCantidad = new TextField();
+    fCantidad.setPromptText("Cantidad");
+    fCantidad.setPrefWidth(100);
+    fCantidad.textProperty().addListener((obs, oldText, newText) -> {
+        if (!newText.matches("\\d*")) fCantidad.setText(newText.replaceAll("[^\\d]", ""));
+    });
+
+    DatePicker fFechaEntrega = new DatePicker();
+    fFechaEntrega.setPromptText("Fecha de entrega deseada");
+
+    TextField fObservaciones = new TextField();
+    fObservaciones.setPromptText("Observaciones (opcional)");
+    fObservaciones.setPrefWidth(300);
+
+    Label lblTotal = new Label("Total estimado: S/ 0.00");
+    lblTotal.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #4CAF50;");
+
+    // Calcular total al cambiar cantidad
+    fCantidad.textProperty().addListener((obs, oldText, newText) -> {
+        Producto seleccionado = tablaProductos.getSelectionModel().getSelectedItem();
+        if (seleccionado != null && !newText.isEmpty()) {
+            try {
+                int cant = Integer.parseInt(newText);
+                double total = seleccionado.getPrecioUnitario() * cant;
+                lblTotal.setText("Total estimado: S/ " + String.format("%.2f", total));
+            } catch (NumberFormatException ex) {
+                lblTotal.setText("Total estimado: S/ 0.00");
+            }
+        }
+    });
+
+    tablaProductos.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+        if (newVal != null && !fCantidad.getText().isEmpty()) {
+            try {
+                int cant = Integer.parseInt(fCantidad.getText());
+                double total = newVal.getPrecioUnitario() * cant;
+                lblTotal.setText("Total estimado: S/ " + String.format("%.2f", total));
+            } catch (NumberFormatException ex) {}
+        }
+    });
+
+    Button btnSolicitar = new Button("Solicitar Pedido");
+    btnSolicitar.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; " +
+                          "-fx-font-weight: bold; -fx-pref-height: 38px; -fx-background-radius: 6; -fx-cursor: hand;");
+
+    btnSolicitar.setOnAction(e -> {
+        Producto seleccionado = tablaProductos.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarAlerta("Selecciona un producto del catálogo");
+            return;
+        }
+        if (fCantidad.getText().isEmpty()) {
+            mostrarAlerta("Ingresa la cantidad");
+            return;
+        }
+        if (fFechaEntrega.getValue() == null) {
+            mostrarAlerta("Selecciona la fecha de entrega deseada");
+            return;
+        }
+
+        int cantidad = Integer.parseInt(fCantidad.getText());
+        double total = seleccionado.getPrecioUnitario() * cantidad;
+
+        // Buscar el cliente por DNI
+        Cliente clienteActual = ClienteControlador.buscarPorDni(usuario.getDni());
+        if (clienteActual == null) {
+            mostrarAlerta("No se encontró tu perfil de cliente");
+            return;
+        }
+
+        Pedido p = new Pedido();
+        p.setClienteId(clienteActual.getId());
+        p.setEmpleadoId(0);
+        p.setFechaPedido(java.time.LocalDate.now());
+        p.setFechaEntrega(fFechaEntrega.getValue());
+        p.setEstado("PENDIENTE");
+        p.setTotal(total);
+
+        boolean exito = PedidoControlador.agregar(p);
+        if (exito) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Pedido enviado");
+            alert.setContentText("Tu pedido de " + cantidad + " x " +
+                seleccionado.getNombreProducto() + " fue enviado correctamente. " +
+                "Total: S/ " + String.format("%.2f", total));
+            alert.showAndWait();
+            mostrarPanelPrincipal(usuario);
+        } else {
+            mostrarAlerta("Error al enviar el pedido");
+        }
+    });
+
+    GridPane formPedido = new GridPane();
+    formPedido.setHgap(15); formPedido.setVgap(10);
+    formPedido.setPadding(new Insets(15));
+    formPedido.setStyle("-fx-background-color: white; -fx-background-radius: 10; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
+
+    formPedido.add(new Label("Cantidad:"), 0, 0); formPedido.add(fCantidad, 1, 0);
+    formPedido.add(new Label("Fecha entrega:"), 0, 1); formPedido.add(fFechaEntrega, 1, 1);
+    formPedido.add(new Label("Observaciones:"), 0, 2); formPedido.add(fObservaciones, 1, 2);
+    formPedido.add(lblTotal, 0, 3, 2, 1);
+    formPedido.add(btnSolicitar, 0, 4, 2, 1);
+
+    vista.getChildren().addAll(lblTitulo, barraBusqueda, tablaProductos, lblPedido, formPedido);
+
+    ScrollPane scroll = new ScrollPane(vista);
+    scroll.setFitToWidth(true);
+    scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+    contenido.getChildren().setAll(scroll);
+}
+
+    private void cargarProductos(TableView<Producto> tabla, String categoria) {
+    javafx.collections.ObservableList<Producto> lista =
+        javafx.collections.FXCollections.observableArrayList();
+    for (Producto p : ProductoControlador.listar()) {
+        if (categoria.equals("TODOS") || p.getCategoria().equals(categoria)) {
+            lista.add(p);
+        }
+    }
+    tabla.setItems(lista);
+}
+
+private void mostrarAlerta(String mensaje) {
+    Alert alert = new Alert(Alert.AlertType.WARNING);
+    alert.setTitle("Aviso");
+    alert.setContentText(mensaje);
+    alert.showAndWait();
+}
 
     public Scene getScene() {
         return scene;
